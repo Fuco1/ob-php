@@ -1,0 +1,29 @@
+* ob-php
+
+** Org mode Babel support for PHP
+
+*Only the most basic evaluation is currently possible*
+
+*** Usage
+
+**** Load/evaluate the code and require =ob-php=
+
+#+BEGIN_SRC emacs-lisp
+  (with-temp-buffer
+    (url-insert-file-contents "https://raw.github.com/steckerhalter/ob-php/master/ob-php.el")
+    (eval-buffer))
+  (require 'ob-php)
+#+END_SRC
+
+
+**** Add PHP to the allowed languages for Babel
+
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (php . t)
+     ))
+#+END_SRC
+
+That's it, you should be good to go!
