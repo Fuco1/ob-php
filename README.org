@@ -4,7 +4,7 @@
 
 *Only the most basic evaluation is currently possible*
 
-*** Usage
+*** Manual installation
 
 **** Load/evaluate the code and require =ob-php=
 
@@ -19,11 +19,22 @@
 **** Add PHP to the allowed languages for Babel
 
 #+BEGIN_SRC emacs-lisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (php . t)
-     ))
+  (add-to-list 'org-babel-load-languages '(php . t))
+  (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
 #+END_SRC
 
 That's it, you should be good to go!
+
+*** El-Get Recipe
+
+#+BEGIN_SRC emacs-lisp
+  (:name ob-php
+         :type http
+         :url "https://raw.github.com/steckerhalter/ob-php/master/ob-php.el"
+         :prepare (progn
+                    (add-to-list 'org-babel-load-languages '(php . t))
+                    (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
+  ))
+#+END_SRC
+
+
