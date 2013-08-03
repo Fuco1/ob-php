@@ -29,7 +29,7 @@
 
 ;;; Requirements:
 
-;; php-cli installation
+;; php command line executable
 
 ;;; Code:
 (require 'ob)
@@ -39,19 +39,89 @@
 
 (defvar org-babel-default-header-args:php '())
 
+(defvar org-babel-php-command "php"
+  "Name of command to use for executing ruby code.")
+
 (defun org-babel-execute:php (body params)
   "Execute a block of PHP code with Babel.
 This function is called by `org-babel-execute-src-block'."
-  (let* ((result-params (split-string (or (cdr (assoc :results params)) "")))
-         (file (cdr (assoc :file params)))
-         (cmdline (cdr (assoc :cmdline params)))
-         (cmd (concat "php " (or cmdline "")
-                      "-r '" (org-babel-expand-body:generic body params)"'")))
-         (org-babel-eval cmd "")))
+  (unless (string= (cdr (assoc :session params)) "none")
+    (error "session support not yet implemented, please try without a session"))
+  (let* ((result-params (cdr (assoc :result-params params)))
+         (result-type (cdr (assoc :result-type params)))
+         (full-body (org-babel-expand-body:generic
+                     body params (org-babel-variable-assignments:php params)))
+         (result (org-babel-php-evaluate full-body result-type result-params)))
+    (org-babel-reassemble-table
+     result
+     (org-babel-pick-name (cdr (assoc :colname-names params))
+                          (cdr (assoc :colnames params)))
+     (org-babel-pick-name (cdr (assoc :rowname-names params))
+                          (cdr (assoc :rownames params))))))
 
-(defun org-babel-prep-session:php (session params)
-  "Raise an error because PHP does not support sessions."
-  (error "PHP does not support sessions"))
+(defun org-babel-variable-assignments:php (params)
+  "Return list of PHP statements assigning the block's variables."
+  (mapcar
+   (lambda (pair)
+     (format "$%s = %s;"
+             (car pair)
+             (org-babel-php-var-to-php (cdr pair))))
+   (mapcar #'cdr (org-babel-get-header params :var))))
+
+(defun org-babel-php-var-to-php (var)
+  "Convert VAR into a php variable.
+Convert an elisp value into a string of PHP source code
+specifying a variable of the same value."
+  (if (listp var)
+      (concat "[" (mapconcat #'org-babel-php-var-to-php var ", ") "]")
+    (format "%S" var)))
+
+(defun org-babel-php-table-or-string (results)
+  "Convert RESULTS into an appropriate elisp value.
+If RESULTS look like a table, then convert them into an
+Emacs-lisp table, otherwise return the results as a string."
+  (org-babel-script-escape results))
+
+(defvar org-babel-php-wrapper-method
+  "
+<?php
+$code = <<<'EOF'
+%s
+EOF;
+$results = eval($code);
+file_put_contents('%s', $results);
+")
+
+(defvar org-babel-php-pp-wrapper-method
+  "
+<?php
+$code = <<<'EOF'
+%s
+EOF;
+$results = eval($code);
+file_put_contents('%s', print_r($results, true));
+")
+
+(defun org-babel-php-evaluate (body &optional result-type result-params)
+  "Process BODY with PHP using a temp file.
+If RESULT-TYPE equals 'output then return a list of the outputs
+of the statements in BODY, if RESULT-TYPE equals 'value then
+return the value of the last statement in BODY, as elisp."
+  (case result-type
+    (output (org-babel-eval org-babel-php-command (concat "<?php\n" body)))
+    (value (let ((tmp-file (org-babel-temp-file "php-")))
+             (org-babel-eval
+              org-babel-php-command
+              (format (if (member "pp" result-params)
+                          org-babel-php-pp-wrapper-method
+                        org-babel-php-wrapper-method)
+                      body (org-babel-process-file-name tmp-file 'noquote)))
+             ((lambda (raw)
+                (if (or (member "code" result-params)
+                        (member "pp" result-params))
+                    raw
+                  (org-babel-php-table-or-string raw)))
+              (org-babel-eval-read-file tmp-file))))))
 
 (provide 'ob-php)
 ;;; ob-php.el ends here

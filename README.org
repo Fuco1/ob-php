@@ -2,7 +2,7 @@
 
 ** Org mode Babel support for PHP
 
-*Only the most basic evaluation is currently possible*
+*Sessions are not yet supported*
 
 *** Manual installation
 
@@ -38,3 +38,43 @@ That's it, you should be good to go!
 #+END_SRC
 
 
+*** Usage
+
+#+BEGIN_SRC php :var x="bear" :var y="mordor"
+  4 + 4;
+  print "dude\n";
+  print $x;
+  return $y;
+#+END_SRC
+
+#+RESULTS:
+: mordor
+
+#+BEGIN_SRC php :results output :var x="bear" :var y="mordor"
+  4 + 4;
+  print "dude\n";
+  print $x;
+  return $y;
+#+END_SRC
+
+#+RESULTS:
+: dude
+: bear
+
+#+NAME: dude
+#+BEGIN_SRC php :results pp
+  $dude = new stdClass();
+  $dude->man = "green";
+  $dude->pleora = new stdClass();
+  return $dude;
+#+END_SRC
+
+#+RESULTS:
+: stdClass Object
+: (
+:     [man] => green
+:     [pleora] => stdClass Object
+:         (
+:         )
+:
+: )
