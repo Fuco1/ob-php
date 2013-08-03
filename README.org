@@ -78,3 +78,21 @@ That's it, you should be good to go!
 :         )
 :
 : )
+
+#+BEGIN_SRC php :var sea="blue" :results output org
+  $test = array(
+      array('forest', 'green'),
+      array('sea',  $sea),
+  );
+
+  foreach ($test as $row) {
+      foreach($row as $cell) { print '|' . $cell; };
+      print "\n";
+  }
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_SRC org
+| forest | green |
+| sea    | blue  |
+#+END_SRC
