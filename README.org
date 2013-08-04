@@ -2,7 +2,25 @@
 
 ** Org mode Babel support for PHP
 
-*Sessions are not yet supported*
+*** Prerequisites for Sessions
+
+Per default Babel doesn't use Sessions, so this is only needed for advanced operations...
+
+- boris - PHP Read Eval Print Loop (REPL)
+
+  https://github.com/d11wtq/Boris
+
+  *I wasted many hours trying to get the lousy PHP shell to work here (php -a). Then I discovered that it wasn't even the real shell, but "interactive mode". I have no idea why as =readline= was available.*
+
+  I also had to comment this in =php.ini= for Boris to work:
+
+  #+BEGIN_SRC conf
+  ; disable_functions = pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,
+  #+END_SRC
+
+- php-boris - an Emacs extension for Boris
+
+  From [[http://melpa.milkbox.net/][MELPA]], install via =M-x package-install=
 
 *** Manual installation
 

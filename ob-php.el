@@ -45,13 +45,12 @@
 (defun org-babel-execute:php (body params)
   "Execute a block of PHP code with Babel.
 This function is called by `org-babel-execute-src-block'."
-  (unless (string= (cdr (assoc :session params)) "none")
-    (error "session support not yet implemented, please try without a session"))
-  (let* ((result-params (cdr (assoc :result-params params)))
+  (let* ((session (org-babel-php-initiate-session (cdr (assoc :session params))))
+         (result-params (cdr (assoc :result-params params)))
          (result-type (cdr (assoc :result-type params)))
          (full-body (org-babel-expand-body:generic
                      body params (org-babel-variable-assignments:php params)))
-         (result (org-babel-php-evaluate full-body result-type result-params)))
+         (result (org-babel-php-evaluate session full-body result-type result-params)))
     (org-babel-reassemble-table
      result
      (org-babel-pick-name (cdr (assoc :colname-names params))
@@ -82,6 +81,35 @@ If RESULTS look like a table, then convert them into an
 Emacs-lisp table, otherwise return the results as a string."
   (org-babel-script-escape results))
 
+(defun org-babel-prep-session:php (session params)
+  "Prepare SESSION according to the header arguments specified in PARAMS."
+  (let* ((session (org-babel-php-initiate-session session))
+         (var-lines (org-babel-variable-assignments:php params)))
+    (org-babel-comint-in-buffer session
+      (sit-for .5) (goto-char (point-max))
+      (mapc (lambda (var)
+              (insert var) (comint-send-input nil t)
+              (org-babel-comint-wait-for-output session)
+              (sit-for .1) (goto-char (point-max))) var-lines))
+    session))
+
+(defun org-babel-php-initiate-session (&optional session params)
+  "Initiate a PHP session.
+If there is not a current inferior-process-buffer in SESSION
+then create one.  Return the initialized session."
+  (unless (string= session "none")
+  (require 'php-boris)
+    (let ((session-buffer (save-window-excursion
+			    (php-boris) (current-buffer))))
+      (if (org-babel-comint-buffer-livep session-buffer)
+          (progn (sit-for .05)
+                 session-buffer)
+        (sit-for .5)
+        (org-babel-php-initiate-session session)))))
+
+(defvar org-babel-php-eoe-indicator "\"org_babel_php_eoe\""
+  "String to indicate that evaluation has completed.")
+
 (defvar org-babel-php-wrapper-method
   "
 <?php
@@ -102,11 +130,20 @@ $results = eval($code);
 file_put_contents('%s', print_r($results, true));
 ")
 
-(defun org-babel-php-evaluate (body &optional result-type result-params)
-  "Process BODY with PHP using a temp file.
-If RESULT-TYPE equals 'output then return a list of the outputs
-of the statements in BODY, if RESULT-TYPE equals 'value then
-return the value of the last statement in BODY, as elisp."
+(defun org-babel-php-evaluate (session body &optional result-type result-params)
+  "Evaluate BODY as PHP code."
+    (if session
+      (org-babel-php-evaluate-session
+       session body result-type result-params)
+    (org-babel-php-evaluate-external-process
+     body result-type result-params)))
+
+(defun org-babel-php-evaluate-external-process
+  (body &optional result-type result-params)
+  "Evaluate BODY in external PHP process.
+If RESULT-TYPE equals 'output then return standard output as a
+string.  If RESULT-TYPE equals 'value then return the value of the
+last statement in BODY, as elisp."
   (case result-type
     (output (org-babel-eval org-babel-php-command (concat "<?php\n" body)))
     (value (let ((tmp-file (org-babel-temp-file "php-")))
@@ -122,6 +159,21 @@ return the value of the last statement in BODY, as elisp."
                     raw
                   (org-babel-php-table-or-string raw)))
               (org-babel-eval-read-file tmp-file))))))
+
+(defun org-babel-php-evaluate-session
+  (session body &optional result-type result-params)
+  "Pass BODY to the PHP process in SESSION.
+If RESULT-TYPE equals 'output then return standard output as a
+string.  If RESULT-TYPE equals 'value then return the value of the
+last statement in BODY, as elisp."
+    (nth 1
+         (org-babel-comint-with-output
+             (session org-babel-php-eoe-indicator t body)
+           (mapc
+            (lambda (line)
+              (insert (org-babel-chomp line))
+              (comint-send-input nil t))
+            (list body org-babel-php-eoe-indicator)))))
 
 (provide 'ob-php)
 ;;; ob-php.el ends here
