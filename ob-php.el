@@ -98,16 +98,13 @@ Emacs-lisp table, otherwise return the results as a string."
 If there is not a current inferior-process-buffer in SESSION
 then create one.  Return the initialized session."
   (unless (string= session "none")
-  (require 'php-boris)
-    (let ((session-buffer (save-window-excursion
-			    (php-boris) (current-buffer))))
+    (require 'php-boris)
+    (let ((session-buffer (save-window-excursion (php-boris) (current-buffer))))
       (if (org-babel-comint-buffer-livep session-buffer)
-          (progn (sit-for .05)
-                 session-buffer)
-        (sit-for .5)
-        (org-babel-php-initiate-session session)))))
+          (progn (sit-for .2) session-buffer)
+        (error "Could not create session with php-boris")))))
 
-(defvar org-babel-php-eoe-indicator "\"org_babel_php_eoe\""
+(defvar org-babel-php-eoe-indicator "\"org_babel_php_eoe\";"
   "String to indicate that evaluation has completed.")
 
 (defvar org-babel-php-wrapper-method
@@ -166,14 +163,27 @@ last statement in BODY, as elisp."
 If RESULT-TYPE equals 'output then return standard output as a
 string.  If RESULT-TYPE equals 'value then return the value of the
 last statement in BODY, as elisp."
-    (nth 1
-         (org-babel-comint-with-output
-             (session org-babel-php-eoe-indicator t body)
-           (mapc
-            (lambda (line)
-              (insert (org-babel-chomp line))
-              (comint-send-input nil t))
-            (list body org-babel-php-eoe-indicator)))))
+  (let ((buffer (get-buffer-create " *boris-repl-out*")) output)
+    (with-current-buffer buffer
+      (comint-redirect-send-command-to-process body buffer session t t)
+      (sit-for .2 t)
+      (setq output (buffer-string))
+      (message comint-prompt-regexp)
+      (erase-buffer)
+      )
+    (mapconcat  #'identity
+                (split-string (ansi-color-filter-apply output) "\r\n")
+                "\n")
+    ))
+
+;; (defun comint-redirect-results-list (command regexp regexp-group)
+;;   "Send COMMAND to current process.
+;; Return a list of expressions in the output which match REGEXP.
+;; REGEXP-GROUP is the regular expression group in REGEXP to use."
+;;   (comint-redirect-results-list-from-process
+;;    (get-buffer-process (current-buffer))
+;;    command regexp regexp-group))
+
 
 (provide 'ob-php)
 ;;; ob-php.el ends here

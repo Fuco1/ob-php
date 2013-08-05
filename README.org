@@ -38,7 +38,7 @@ Per default Babel doesn't use Sessions, so this is only needed for advanced oper
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-babel-load-languages '(php . t))
-  (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
+  (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
 #+END_SRC
 
 That's it, you should be good to go!
