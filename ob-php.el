@@ -81,18 +81,6 @@ If RESULTS look like a table, then convert them into an
 Emacs-lisp table, otherwise return the results as a string."
   (org-babel-script-escape results))
 
-(defun org-babel-prep-session:php (session params)
-  "Prepare SESSION according to the header arguments specified in PARAMS."
-  (let* ((session (org-babel-php-initiate-session session))
-         (var-lines (org-babel-variable-assignments:php params)))
-    (org-babel-comint-in-buffer session
-      (sit-for .5) (goto-char (point-max))
-      (mapc (lambda (var)
-              (insert var) (comint-send-input nil t)
-              (org-babel-comint-wait-for-output session)
-              (sit-for .1) (goto-char (point-max))) var-lines))
-    session))
-
 (defun org-babel-php-initiate-session (&optional session params)
   "Initiate a PHP session.
 If there is not a current inferior-process-buffer in SESSION
@@ -112,16 +100,19 @@ then create one.  Return the initialized session."
 (defvar org-babel-php-comint-preoutput-var nil)
 
 (defun org-babel-php-comint-preoutput-filter (string)
-  "REPL output STRING is run through this function."
+  "REPL output STRING is run through this function.
+We filter out all the return values and the boris> prompts so
+that only output remains.  An empty string is passed to the boris
+repl so that we don't clutter it."
   (setq org-babel-php-comint-preoutput-var
-        (mapconcat (lambda (l)
-                     (cond
-                      ((eq (string-match " →" l) 0) "")
-                      (l)))
+        (org-babel-trim
+         (mapconcat (lambda (l)
+                     (replace-regexp-in-string "\\(^\\|\n\\) → .*?\\($\\|\n\\)" "" l))
                    (split-string
-                    (replace-regexp-in-string "\r" ""
-                    (ansi-color-filter-apply string)) "\\[[0-9]+\\] boris> ")
-                   ""))
+                    (replace-regexp-in-string
+                     "\r" ""
+                     (ansi-color-filter-apply string)) "\\[[0-9]+\\] boris> ")
+                   "")))
   "")
 
 (defvar org-babel-php-wrapper-method
@@ -180,32 +171,22 @@ last statement in BODY, as elisp."
 If RESULT-TYPE equals 'output then return standard output as a
 string.  If RESULT-TYPE equals 'value then return the value of the
 last statement in BODY, as elisp."
-  (let ((buffer (generate-new-buffer " *boris-repl-temp*")) result)
-    (comint-redirect-send-command-to-process body buffer session nil t)
-    (while (not org-babel-php-comint-preoutput-var)
-      (sit-for .1))
-    (kill-buffer buffer)
-    (setq result org-babel-php-comint-preoutput-var)
-    (setq org-babel-php-comint-preoutput-var nil)
-    result
-    ))
-
-  ;; (save-excursion
-  ;;   (set-buffer session)
-  ;;   (buffer-substring-no-properties comint-last-output-start (point-max))
-  ;;   )
-    ;; (mapconcat  #'identity
-    ;;             (split-string (ansi-color-filter-apply output) "\r\n")
-    ;;             "\n")
-
-;; (defun comint-redirect-results-list (command regexp regexp-group)
-;;   "Send COMMAND to current process.
-;; Return a list of expressions in the output which match REGEXP.
-;; REGEXP-GROUP is the regular expression group in REGEXP to use."
-;;   (comint-redirect-results-list-from-process
-;;    (get-buffer-process (current-buffer))
-;;    command regexp regexp-group))
-
+  (unwind-protect
+      (case result-type
+        (output
+         (let ((buffer (generate-new-buffer " *boris-repl-temp*")) result)
+           (comint-redirect-send-command-to-process body buffer session nil t)
+           (while (not org-babel-php-comint-preoutput-var)
+             (sit-for .1))
+           (kill-buffer buffer)
+           (setq result org-babel-php-comint-preoutput-var)
+           (setq org-babel-php-comint-preoutput-var nil)
+           result
+           ))
+        (value
+         (error "Value support for session not implemented yet"))))
+  (setq org-babel-php-comint-preoutput-var nil))
 
 (provide 'ob-php)
+
 ;;; ob-php.el ends here
