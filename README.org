@@ -22,6 +22,8 @@ Per default Babel doesn't use Sessions, so this is only needed for advanced oper
 
   From [[http://melpa.milkbox.net/][MELPA]], install via =M-x package-install=
 
+  *Currently only sessions with output work*
+
 *** Manual installation
 
 **** Load/evaluate the code and require =ob-php=
@@ -58,6 +60,8 @@ That's it, you should be good to go!
 
 *** Usage
 
+**** No session
+
 #+BEGIN_SRC php :var x="bear" :var y="mordor"
   4 + 4;
   print "dude\n";
@@ -79,6 +83,8 @@ That's it, you should be good to go!
 : dude
 : bear
 
+**** Pretty printing
+
 #+NAME: dude
 #+BEGIN_SRC php :results pp
   $dude = new stdClass();
@@ -97,6 +103,8 @@ That's it, you should be good to go!
 :
 : )
 
+**** Org output
+
 #+BEGIN_SRC php :var sea="blue" :results output org
   $test = array(
       array('forest', 'green'),
@@ -114,3 +122,53 @@ That's it, you should be good to go!
 | forest | green |
 | sea    | blue  |
 #+END_SRC
+
+**** TODO Session with output
+- Note taken on [2013-08-06 Tue 01:43] \\
+  This is wrong and should be fixed. The result is not really output!
+
+#+BEGIN_SRC php :results output :session
+$x = array("mond" => "schein", array("sonate", "betthofen"));
+#+END_SRC
+
+#+RESULTS:
+: 'mond' => 'schein',
+:   0 => array(
+:     0 => 'sonate',
+:     1 => 'betthofen'
+:   )
+: )
+
+
+**** Use previouly defined PHP variable
+
+#+BEGIN_SRC php :results output :session
+print $x;
+#+END_SRC
+
+#+RESULTS:
+: PHP Notice:  Array to string conversion in /home/reto/boris/lib/Boris/EvalWorker.php(133) : eval()'d code on line 1
+: Array
+
+
+**** Why does this make an example block?
+
+#+BEGIN_SRC php :results output :session
+var_dump($x);
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+array(2) {
+  ["mond"]=>
+  string(6) "schein"
+  [0]=>
+  array(2) {
+    [0]=>
+    string(6) "sonate"
+    [1]=>
+    string(9) "betthofen"
+  }
+}
+#+end_example
+
