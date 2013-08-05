@@ -114,11 +114,15 @@ then create one.  Return the initialized session."
 (defun org-babel-php-comint-preoutput-filter (string)
   "REPL output STRING is run through this function."
   (setq org-babel-php-comint-preoutput-var
-        (mapconcat (lambda (l) l)
+        (mapconcat (lambda (l)
+                     (cond
+                      ((eq (string-match " →" l) 0) "")
+                      (l)))
                    (split-string
-                    (ansi-color-filter-apply string) "\\[[0-9]+\\] boris> ")
-                   "\n"))
-  string)
+                    (replace-regexp-in-string "\r" ""
+                    (ansi-color-filter-apply string)) "\\[[0-9]+\\] boris> ")
+                   ""))
+  "")
 
 (defvar org-babel-php-wrapper-method
   "
