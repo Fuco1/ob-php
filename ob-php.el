@@ -99,13 +99,26 @@ If there is not a current inferior-process-buffer in SESSION
 then create one.  Return the initialized session."
   (unless (string= session "none")
     (require 'php-boris)
-    (let ((session-buffer (save-window-excursion (php-boris) (current-buffer))))
+    (let ((session-buffer
+           (save-window-excursion
+             (php-boris)
+             (add-hook 'comint-preoutput-filter-functions
+                       'org-babel-php-comint-preoutput-filter nil t)
+             (current-buffer))))
       (if (org-babel-comint-buffer-livep session-buffer)
           (progn (sit-for .2) session-buffer)
         (error "Could not create session with php-boris")))))
 
-(defvar org-babel-php-eoe-indicator "\"org_babel_php_eoe\";"
-  "String to indicate that evaluation has completed.")
+(defvar org-babel-php-comint-preoutput-var nil)
+
+(defun org-babel-php-comint-preoutput-filter (string)
+  "REPL output STRING is run through this function."
+  (setq org-babel-php-comint-preoutput-var
+        (mapconcat (lambda (l) l)
+                   (split-string
+                    (ansi-color-filter-apply string) "\\[[0-9]+\\] boris> ")
+                   "\n"))
+  string)
 
 (defvar org-babel-php-wrapper-method
   "
@@ -163,18 +176,23 @@ last statement in BODY, as elisp."
 If RESULT-TYPE equals 'output then return standard output as a
 string.  If RESULT-TYPE equals 'value then return the value of the
 last statement in BODY, as elisp."
-  (let ((buffer (get-buffer-create " *boris-repl-out*")) output)
-    (with-current-buffer buffer
-      (comint-redirect-send-command-to-process body buffer session t t)
-      (sit-for .2 t)
-      (setq output (buffer-string))
-      (message comint-prompt-regexp)
-      (erase-buffer)
-      )
-    (mapconcat  #'identity
-                (split-string (ansi-color-filter-apply output) "\r\n")
-                "\n")
+  (let ((buffer (generate-new-buffer " *boris-repl-temp*")) result)
+    (comint-redirect-send-command-to-process body buffer session nil t)
+    (while (not org-babel-php-comint-preoutput-var)
+      (sit-for .1))
+    (kill-buffer buffer)
+    (setq result org-babel-php-comint-preoutput-var)
+    (setq org-babel-php-comint-preoutput-var nil)
+    result
     ))
+
+  ;; (save-excursion
+  ;;   (set-buffer session)
+  ;;   (buffer-substring-no-properties comint-last-output-start (point-max))
+  ;;   )
+    ;; (mapconcat  #'identity
+    ;;             (split-string (ansi-color-filter-apply output) "\r\n")
+    ;;             "\n")
 
 ;; (defun comint-redirect-results-list (command regexp regexp-group)
 ;;   "Send COMMAND to current process.
