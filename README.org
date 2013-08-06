@@ -176,10 +176,13 @@ array(2) {
 }
 #+end_example
 
+#+HTML: <style>body { margin: 20px !important; }</style>
+#+HTML: <script src="https://code.jquery.com/jquery.js"></script>
+#+HTML: <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+
 * Options                                                  :noexport:ARCHIVE:
 
 #+OPTIONS: todo:nil html-style:nil
+#+INFOJS_OPT: view:showall toc:nil mouse:#555555
 #+HTML_HEAD: <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
-#+HTML_HEAD: <link href="https://raw.github.com/danneu/darkstrap/master/darkstrap.css" rel="stylesheet">
-#+HTML: <script src="https://code.jquery.com/jquery.js"></script>
-#+HTML: <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+#+HTML_HEAD: <link href="http://danneu.com/bag/darkstrap/legacy/stylesheets/darkstrap.css" rel="stylesheet">
