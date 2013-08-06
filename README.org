@@ -179,7 +179,7 @@ array(2) {
 * Options                                                  :noexport:ARCHIVE:
 
 #+OPTIONS: todo:nil html-style:nil
-#+HTML_HEAD: <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+#+HTML_HEAD: <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
 #+HTML_HEAD: <link href="https://raw.github.com/danneu/darkstrap/master/darkstrap.css" rel="stylesheet">
-#+HTML: <script src="http://code.jquery.com/jquery.js"></script>
-#+HTML: <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+#+HTML: <script src="https://code.jquery.com/jquery.js"></script>
+#+HTML: <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
