@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>README</title>
+<!-- 2013-08-06 Tue 18:36 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+<link href="https://raw.github.com/danneu/darkstrap/master/darkstrap.css" rel="stylesheet">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">README</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. ob-php</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Org mode Babel support for PHP</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. Prerequisites for Sessions</a></li>
+<li><a href="#sec-1-1-2">1.1.2. Manual installation</a></li>
+<li><a href="#sec-1-1-3">1.1.3. El-Get Recipe</a></li>
+<li><a href="#sec-1-1-4">1.1.4. Usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> ob-php</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Org mode Babel support for PHP</h3>
+<div class="outline-text-3" id="text-1-1">
+</div><div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> Prerequisites for Sessions</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+Per default Babel doesn't use Sessions, so this is only needed for advanced operations&#x2026;
+</p>
+
+<ul class="org-ul">
+<li>boris - PHP Read Eval Print Loop (REPL)
+
+<p>
+<a href="https://github.com/d11wtq/Boris">https://github.com/d11wtq/Boris</a>
+</p>
+
+<p>
+<b>I wasted many hours trying to get the lousy PHP shell to work here (php -a). Then I discovered that it wasn't even the real shell, but "interactive mode". I have no idea why as <code>readline</code> was available.</b>
+</p>
+
+<p>
+I also had to comment this in <code>php.ini</code> for Boris to work:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-conf"><span style="color: #f6df92;">; disable_functions</span> = pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,
+</pre>
+</div>
+</li>
+
+<li>php-boris - an Emacs extension for Boris
+
+<p>
+From <a href="http://melpa.milkbox.net/">MELPA</a>, install via <code>M-x package-install</code>
+</p>
+
+<p>
+<b>Currently only sessions with output work</b>
+</p>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> Manual installation</h4>
+<div class="outline-text-4" id="text-1-1-2">
+</div><ol class="org-ol"><li>Load/evaluate the code and require <code>ob-php</code><br  /><div class="outline-text-5" id="text-1-1-2-1">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp">(<span style="color: #5af2ee;">with-temp-buffer</span>
+  (url-insert-file-contents <span style="color: #ff5f87;">"https://raw.github.com/steckerhalter/ob-php/master/ob-php.el"</span>)
+  (eval-buffer))
+(<span style="color: #5af2ee;">require</span> '<span style="color: #acfb5a;">ob-php</span>)
+</pre>
+</div>
+</div>
+</li>
+
+<li>Add PHP to the allowed languages for Babel<br  /><div class="outline-text-5" id="text-1-1-2-2">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp">(add-to-list 'org-babel-load-languages '(php . t))
+(org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
+</pre>
+</div>
+
+<p>
+That's it, you should be good to go!
+</p>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-1-3" class="outline-4">
+<h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> El-Get Recipe</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp">(<span style="color: #b2baf6;">:name</span> ob-php
+       <span style="color: #b2baf6;">:type</span> http
+       <span style="color: #b2baf6;">:url</span> <span style="color: #ff5f87;">"https://raw.github.com/steckerhalter/ob-php/master/ob-php.el"</span>
+       <span style="color: #b2baf6;">:prepare</span> (<span style="color: #5af2ee;">progn</span>
+                  (add-to-list 'org-babel-load-languages '(php . t))
+                  (org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)))
+))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-1-4" class="outline-4">
+<h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> Usage</h4>
+<div class="outline-text-4" id="text-1-1-4">
+</div>
+
+
+<ol class="org-ol"><li>No session<br  /><div class="outline-text-5" id="text-1-1-4-1">
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #babdb6; background-color: #000000;">4</span> + <span style="color: #babdb6; background-color: #000000;">4</span>;
+<span style="color: #5af2ee;">print</span> <span style="color: #ff5f87;">"dude\n"</span>;
+<span style="color: #5af2ee;">print</span> $<span style="color: #f6df92;">x</span>;
+<span style="color: #5af2ee;">return</span> $<span style="color: #f6df92;">y</span>;
+</pre>
+</div>
+
+<pre class="example">
+mordor
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #babdb6; background-color: #000000;">4</span> + <span style="color: #babdb6; background-color: #000000;">4</span>;
+<span style="color: #5af2ee;">print</span> <span style="color: #ff5f87;">"dude\n"</span>;
+<span style="color: #5af2ee;">print</span> $<span style="color: #f6df92;">x</span>;
+<span style="color: #5af2ee;">return</span> $<span style="color: #f6df92;">y</span>;
+</pre>
+</div>
+
+<pre class="example">
+dude
+bear
+</pre>
+</div>
+</li>
+<li>Pretty printing<br  /><div class="outline-text-5" id="text-1-1-4-2">
+<div class="org-src-container">
+
+<pre class="src src-php" id="dude">$<span style="color: #f6df92;">dude</span> = <span style="color: #5af2ee;">new</span> <span style="color: #b2baf6;">stdClass</span>();
+$<span style="color: #f6df92;">dude</span>-&gt;<span style="color: #f6df92;">man</span> = <span style="color: #ff5f87;">"green"</span>;
+$<span style="color: #f6df92;">dude</span>-&gt;<span style="color: #f6df92;">pleora</span> = <span style="color: #5af2ee;">new</span> <span style="color: #b2baf6;">stdClass</span>();
+<span style="color: #5af2ee;">return</span> $<span style="color: #f6df92;">dude</span>;
+</pre>
+</div>
+
+<pre class="example">
+stdClass Object
+(
+    [man] =&gt; green
+    [pleora] =&gt; stdClass Object
+        (
+        )
+
+)
+</pre>
+
+<pre class="example">
+stdClass Object
+(
+    [man] =&gt; green
+    [pleora] =&gt; stdClass Object
+        (
+        )
+
+)
+</pre>
+</div>
+</li>
+<li>Org output<br  /><div class="outline-text-5" id="text-1-1-4-3">
+<div class="org-src-container">
+
+<pre class="src src-php">$<span style="color: #f6df92;">test</span> = <span style="color: #5af2ee;">array</span>(
+    <span style="color: #5af2ee;">array</span>(<span style="color: #ff5f87;">'forest'</span>, <span style="color: #ff5f87;">'green'</span>),
+    <span style="color: #5af2ee;">array</span>(<span style="color: #ff5f87;">'sea'</span>,  $<span style="color: #f6df92;">sea</span>),
+);
+
+<span style="color: #5af2ee;">foreach</span> ($<span style="color: #f6df92;">test</span> <span style="color: #5af2ee;">as</span> $<span style="color: #f6df92;">row</span>) {
+    <span style="color: #5af2ee;">foreach</span>($<span style="color: #f6df92;">row</span> <span style="color: #5af2ee;">as</span> $<span style="color: #f6df92;">cell</span>) { <span style="color: #5af2ee;">print</span> <span style="color: #ff5f87;">'|'</span> . $<span style="color: #f6df92;">cell</span>; };
+    <span style="color: #5af2ee;">print</span> <span style="color: #ff5f87;">"\n"</span>;
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-org"><span style="color: #c350ff;">| forest | green |</span>
+<span style="color: #c350ff;">| sea    | blue  |</span>
+</pre>
+</div>
+</div>
+</li>
+<li>Session with output<br  /><div class="outline-text-5" id="text-1-1-4-4">
+<ul class="org-ul">
+<li>Note taken on <span class="timestamp-wrapper"><span class="timestamp">[2013-08-06 Tue 01:43]</span></span> <br  />
+  This is wrong and should be fixed. The result is not really output!
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-php">$<span style="color: #f6df92;">x</span> = <span style="color: #5af2ee;">array</span>(<span style="color: #ff5f87;">"mond"</span> =&gt; <span style="color: #ff5f87;">"schein"</span>, <span style="color: #5af2ee;">array</span>(<span style="color: #ff5f87;">"sonate"</span>, <span style="color: #ff5f87;">"betthofen"</span>));
+</pre>
+</div>
+
+<pre class="example">
+'mond' =&gt; 'schein',
+  0 =&gt; array(
+    0 =&gt; 'sonate',
+    1 =&gt; 'betthofen'
+  )
+)
+</pre>
+</div>
+</li>
+
+<li>Use previouly defined PHP variable<br  /><div class="outline-text-5" id="text-1-1-4-5">
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #5af2ee;">print</span> $<span style="color: #f6df92;">x</span>;
+</pre>
+</div>
+
+<pre class="example">
+PHP Notice:  Array to string conversion in /home/reto/boris/lib/Boris/EvalWorker.php(133) : eval()'d code on line 1
+Array
+</pre>
+</div>
+</li>
+
+<li>Why does this make an example block?<br  /><div class="outline-text-5" id="text-1-1-4-6">
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #babdb6; background-color: #000000;">var_dump</span>($<span style="color: #f6df92;">x</span>);
+</pre>
+</div>
+
+<pre class="example">
+array(2) {
+  ["mond"]=&gt;
+  string(6) "schein"
+  [0]=&gt;
+  array(2) {
+    [0]=&gt;
+    string(6) "sonate"
+    [1]=&gt;
+    string(9) "betthofen"
+  }
+}
+</pre>
+</div>
+</li></ol>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Created: 2013-08-06 Tue 18:36</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.50.1 (<a href="http://orgmode.org">Org</a> mode 7.9.3f)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

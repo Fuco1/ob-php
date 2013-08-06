@@ -94,7 +94,7 @@ then create one.  Return the initialized session."
                        'org-babel-php-comint-preoutput-filter nil t)
              (current-buffer))))
       (if (org-babel-comint-buffer-livep session-buffer)
-          (progn (sit-for .2) session-buffer)
+          (progn (sit-for .2 t) session-buffer)
         (error "Could not create session with php-boris")))))
 
 (defvar org-babel-php-comint-preoutput-var nil)
@@ -113,7 +113,7 @@ repl so that we don't clutter it."
                      "\r" ""
                      (ansi-color-filter-apply string)) "\\[[0-9]+\\] boris> ")
                    "")))
-  "")
+  string)
 
 (defvar org-babel-php-wrapper-method
   "
@@ -171,21 +171,19 @@ last statement in BODY, as elisp."
 If RESULT-TYPE equals 'output then return standard output as a
 string.  If RESULT-TYPE equals 'value then return the value of the
 last statement in BODY, as elisp."
-  (unwind-protect
-      (case result-type
-        (output
-         (let ((buffer (generate-new-buffer " *boris-repl-temp*")) result)
-           (comint-redirect-send-command-to-process body buffer session nil t)
-           (while (not org-babel-php-comint-preoutput-var)
-             (sit-for .1))
-           (kill-buffer buffer)
-           (setq result org-babel-php-comint-preoutput-var)
-           (setq org-babel-php-comint-preoutput-var nil)
-           result
-           ))
-        (value
-         (error "Value support for session not implemented yet"))))
-  (setq org-babel-php-comint-preoutput-var nil))
+  (case result-type
+    (output
+     (let ((buffer (generate-new-buffer " *boris-repl-temp*")) result)
+       (comint-redirect-send-command-to-process body buffer session nil t)
+       (while (not org-babel-php-comint-preoutput-var)
+         (sit-for .1 t))
+       (kill-buffer buffer)
+       (setq result org-babel-php-comint-preoutput-var)
+       (setq org-babel-php-comint-preoutput-var nil)
+       result
+       ))
+    (value
+     (error "Value support for session not implemented yet"))))
 
 (provide 'ob-php)
 
