@@ -106,13 +106,19 @@ that only output remains.  An empty string is passed to the boris
 repl so that we don't clutter it."
   (setq org-babel-php-comint-preoutput-var
         (org-babel-trim
-         (mapconcat (lambda (l)
-                     (replace-regexp-in-string "\\(^\\|\n\\) → .*?\\($\\|\n\\)" "" l))
-                   (split-string
-                    (replace-regexp-in-string
-                     "\r" ""
-                     (ansi-color-filter-apply string)) "\\[[0-9]+\\] boris> ")
-                   "")))
+         (mapconcat ; put the string together again
+          (lambda (l)
+            (replace-regexp-in-string "\\(^\\|\n\\) → .*?\\($\\|\n\\)" "" l))
+          (split-string ; split the rest around the prompt
+           (replace-regexp-in-string
+            "\r" ""
+            (ansi-color-filter-apply ; filter ansi colors
+             (replace-regexp-in-string
+              (concat "^\\(" org-babel-php-body "\\).*") ; remove echoed input
+              ""
+              string nil nil 1)))
+           "\\[[0-9]+\\] boris> ")
+          "")))
   string)
 
 (defvar org-babel-php-wrapper-method
@@ -173,8 +179,9 @@ string.  If RESULT-TYPE equals 'value then return the value of the
 last statement in BODY, as elisp."
   (case result-type
     (output
+     (setq org-babel-php-body body)
      (let ((buffer (generate-new-buffer " *boris-repl-temp*")) result)
-       (comint-redirect-send-command-to-process body buffer session nil t)
+       (comint-redirect-send-command-to-process body buffer session t t)
        (while (not org-babel-php-comint-preoutput-var)
          (sit-for .1 t))
        (kill-buffer buffer)
