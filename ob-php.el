@@ -114,7 +114,7 @@ repl so that we don't clutter it."
             "\r" ""
             (ansi-color-filter-apply ; filter ansi colors
              (replace-regexp-in-string
-              (concat "^\\(" org-babel-php-body "\\).*") ; remove echoed input
+              (concat "^\\(" org-babel-php-body "\\)\\'") ; remove echoed input
               ""
               string nil nil 1)))
            "\\[[0-9]+\\] boris> ")
