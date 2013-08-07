@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>README</title>
-<!-- 2013-08-07 Wed 07:42 -->
+<!-- 2013-08-07 Wed 07:49 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
@@ -282,23 +282,12 @@ bear
 <li>Pretty printing<br  /><div class="outline-text-5" id="text-1-1-4-2">
 <div class="org-src-container">
 
-<pre class="src src-php" id="dude">$<span style="color: #f6df92;">dude</span> = <span style="color: #5af2ee;">new</span> <span style="color: #b2baf6;">stdClass</span>();
+<pre class="src src-php">$<span style="color: #f6df92;">dude</span> = <span style="color: #5af2ee;">new</span> <span style="color: #b2baf6;">stdClass</span>();
 $<span style="color: #f6df92;">dude</span>-&gt;<span style="color: #f6df92;">man</span> = <span style="color: #ff5f87;">"green"</span>;
 $<span style="color: #f6df92;">dude</span>-&gt;<span style="color: #f6df92;">pleora</span> = <span style="color: #5af2ee;">new</span> <span style="color: #b2baf6;">stdClass</span>();
 <span style="color: #5af2ee;">return</span> $<span style="color: #f6df92;">dude</span>;
 </pre>
 </div>
-
-<pre class="example">
-stdClass Object
-(
-    [man] =&gt; green
-    [pleora] =&gt; stdClass Object
-        (
-        )
-
-)
-</pre>
 
 <pre class="example">
 stdClass Object
@@ -350,10 +339,6 @@ stdClass Object
 
 <pre class="example">
 array(2) {
-  ["mond"]=&gt;
-  string(6) "schein"
-  [0]=&gt;
-  array(2) {
     [0]=&gt;
     string(6) "sonate"
     [1]=&gt;
@@ -372,6 +357,7 @@ array(2) {
 </div>
 
 <pre class="example">
+PHP Notice:  Array to string conversion in /home/reto/boris/lib/Boris/EvalWorker.php(133) : eval()'d code on line 1
 Array
 </pre>
 </div>
@@ -386,6 +372,10 @@ Array
 
 <pre class="example">
 array(2) {
+  ["mond"]=&gt;
+  string(6) "schein"
+  [0]=&gt;
+  array(2) {
     [0]=&gt;
     string(6) "sonate"
     [1]=&gt;
@@ -404,7 +394,7 @@ array(2) {
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2013-08-07 Wed 07:42</p>
+<p class="date">Created: 2013-08-07 Wed 07:49</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.50.1 (<a href="http://orgmode.org">Org</a> mode 7.9.3f)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>

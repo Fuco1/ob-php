@@ -89,7 +89,6 @@ That's it, you should be good to go!
 
 **** Pretty printing
 
-#+NAME: dude
 #+BEGIN_SRC php :results pp
   $dude = new stdClass();
   $dude->man = "green";
