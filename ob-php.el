@@ -45,7 +45,10 @@
 (defun org-babel-execute:php (body params)
   "Execute a block of PHP code with Babel.
 This function is called by `org-babel-execute-src-block'."
-  (let* ((session (org-babel-php-initiate-session (cdr (assoc :session params))))
+  (let* ((org-babel-php-command
+            (or (cdr (assq :php params))
+                org-babel-php-command))
+         (session (org-babel-php-initiate-session (cdr (assoc :session params))))
          (result-params (cdr (assoc :result-params params)))
          (result-type (cdr (assoc :result-type params)))
          (full-body (org-babel-expand-body:generic
